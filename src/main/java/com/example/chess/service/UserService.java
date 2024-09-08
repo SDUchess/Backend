@@ -35,6 +35,9 @@ public class UserService {
     }
 
     public void addStudentToTeacher(Long teacherId, Long studentId) {
+        teacherStudentRepository.findByTeacherIdAndStudentId(teacherId, studentId).ifPresent(ts -> {
+            throw new RuntimeException("该学生已经在教师的管理列表中");
+        });
         User teacher = userRepository.findById(teacherId).orElseThrow();
         User student = userRepository.findById(studentId).orElseThrow();
         TeacherStudent ts = new TeacherStudent();

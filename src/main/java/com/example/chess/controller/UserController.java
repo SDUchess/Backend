@@ -48,12 +48,8 @@ public class UserController {
 
     @PostMapping("/addStudentToTeacher")
     public ResponseEntity<?> addStudentToTeacher(@RequestParam Long teacherId, @RequestParam Long studentId) {
-        try {
-            userService.addStudentToTeacher(teacherId, studentId);
-            return ResponseEntity.ok().body("学生已成功加入管理列表");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("添加学生到管理列表失败");
-        }
+        userService.addStudentToTeacher(teacherId, studentId);
+        return ResponseEntity.ok().body("学生已成功加入管理列表");
     }
 
     // 根据教师 ID 获取其管理的所有学生
@@ -65,12 +61,8 @@ public class UserController {
     // 根据教师 ID 和学生 ID 删除学生
     @DeleteMapping("/teacher/{teacherId}/student/{studentId}")
     public ResponseEntity<?> removeStudentFromTeacher(@PathVariable Long teacherId, @PathVariable Long studentId) {
-        try {
-            userService.removeStudentFromTeacher(teacherId, studentId);
-            return ResponseEntity.ok().body("学生已成功从管理列表中删除");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("删除学生失败");
-        }
+        userService.removeStudentFromTeacher(teacherId, studentId);
+        return ResponseEntity.ok().body("学生已成功从管理列表中删除");
     }
 
 }

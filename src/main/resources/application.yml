@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: chess
+  datasource:
+    url: jdbc:mysql://47.104.224.71:3306/chess?useSSL=false&serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+    username: chess
+    password: aDnv129.23Qkf2..23pK
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
