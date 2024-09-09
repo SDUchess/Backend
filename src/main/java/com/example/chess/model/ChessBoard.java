@@ -17,6 +17,8 @@ public class ChessBoard {
 
     private String name;
 
+    private String description;
+
     @Column(columnDefinition = "TEXT")
     private String initialBoard; // Store as JSON string
 
