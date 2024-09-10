@@ -9,6 +9,7 @@ import com.example.chess.repository.ChessMoveRepository;
 import com.example.chess.repository.TeacherStudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,7 +53,9 @@ public class ChessBoardService {
         }).collect(Collectors.toList());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void deleteChessboard(Long id) {
+        deleteChessMovesByChessboardId(id);
         chessBoardRepository.deleteById(id);
     }
 
