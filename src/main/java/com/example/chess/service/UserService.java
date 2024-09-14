@@ -2,6 +2,7 @@ package com.example.chess.service;
 
 import com.example.chess.model.TeacherStudent;
 import com.example.chess.model.User;
+import com.example.chess.repository.ClassesStudentRepository;
 import com.example.chess.repository.TeacherStudentRepository;
 import com.example.chess.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,10 @@ public class UserService {
 
     @Autowired
     private TeacherStudentRepository teacherStudentRepository;
+
+    @Autowired
+    private ClassesStudentRepository classesStudentRepository;
+
     public User saveUser(User user) {
         return userRepository.save(user);
     }
@@ -61,6 +66,7 @@ public class UserService {
     public void removeStudentFromTeacher(Long teacherId, Long studentId) {
         TeacherStudent teacherStudent = teacherStudentRepository.findByTeacherIdAndStudentId(teacherId, studentId)
                 .orElseThrow(() -> new RuntimeException("未找到该学生与教师的关联"));
+        classesStudentRepository.deleteByStudentId(studentId);
         teacherStudentRepository.delete(teacherStudent);
     }
 }

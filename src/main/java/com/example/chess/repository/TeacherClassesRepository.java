@@ -4,8 +4,10 @@ import com.example.chess.model.Classes;
 import com.example.chess.model.TeacherClasses;
 import com.example.chess.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,5 +29,28 @@ public interface TeacherClassesRepository extends JpaRepository<TeacherClasses,L
             "WHERE tc.teacher_id = :id",
             nativeQuery = true)
     User findTeacherByClass(@Param("id") Long id);
+
+    //删除老师与班级的关联(通过班级id)
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM teacher_classes WHERE class_id = :classId",
+            nativeQuery = true)
+    void deleteByClassId(@Param("classId") Long id);
+
+    //删除老师与班级的关联(通过老师id)
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM teacher_classes WHERE teacher_id = :TeacherId",
+            nativeQuery = true)
+    void deleteByTeacherId(@Param("teacherId") Long id);
+
+    //删除老师与班级的关联(通过老师id和班级id)
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM teacher_classes WHERE teacher_id = :TeacherId AND class_id = :classId",
+            nativeQuery = true)
+    void deleteByTeacherIdAndClassId(@Param("teacherId") Long teacherId,@Param("classId") Long classId);
+
+
 
 }

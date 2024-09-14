@@ -2,14 +2,15 @@ package com.example.chess.model;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
 @ToString
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "classes_student")
 public class ClassesStudent {
 

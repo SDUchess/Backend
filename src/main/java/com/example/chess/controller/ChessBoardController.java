@@ -37,6 +37,13 @@ public class ChessBoardController {
         }
     }
 
+    //根据教师id查找残局
+    @GetMapping("/teacher/{id}")
+    public ResponseEntity<List<ChessBoard>> getChessBoardByTeacherId(@PathVariable Long id){
+        return chessBoardService.getChessBoardByTeacherId(id);
+    }
+
+
     @GetMapping("/all")
     public List<ChessboardDTO> getAllChessboards() {
         return chessBoardService.getAllChessboardsWithMoveCount();

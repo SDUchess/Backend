@@ -1,13 +1,15 @@
 package com.example.chess.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Getter
 @Setter
 @ToString
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "class_board")
 public class ClassBoard {
@@ -16,8 +18,8 @@ public class ClassBoard {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "student_id")
-    private User student;
+    @JoinColumn(name = "board_id")
+    private ChessBoard chessBoard;
 
     @ManyToOne
     @JoinColumn(name = "class_id")

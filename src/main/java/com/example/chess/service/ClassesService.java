@@ -1,15 +1,14 @@
 package com.example.chess.service;
 
-import com.example.chess.model.ChessBoard;
-import com.example.chess.model.Classes;
+import com.example.chess.model.*;
 import com.example.chess.model.DTO.PageResult;
-import com.example.chess.model.User;
 import com.example.chess.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,12 +27,14 @@ public class ClassesService {
     @Autowired
     private TeacherClassesRepository teacherClassesRepository;
 
-    //新增班级
-    public ResponseEntity<Classes> saveClass(Classes classes){
+    //新增班级(会顺便添加教师与班级的关联)
+    public ResponseEntity<Classes> saveClass(Classes classes,User teacher){
         if(classesRepository.findByName(classes.getName()).isPresent()){
             throw new RuntimeException("班级名称重复");
         }
-        return ResponseEntity.ok(classesRepository.save(classes));
+        Classes newClasses = classesRepository.save(classes);
+        teacherClassesRepository.save(new TeacherClasses(null,teacher,newClasses));
+        return ResponseEntity.ok(newClasses);
     }
 
 
@@ -45,9 +46,24 @@ public class ClassesService {
         if(classesRepository.findById(id).isEmpty()){
             throw new RuntimeException("未找到 id 对应的班级");
         }
-        // 先删除班级与学生的关联
+        // 先删除班级与学生、残局和教师的关联
         classesStudentRepository.deleteByClassId(id);
+        classBoardRepository.deleteClassBoardByClassesId(id);
+        teacherClassesRepository.deleteByClassId(id);
+        // 再删除班级
         classesRepository.deleteById(id);
+        return ResponseEntity.ok("删除成功");
+    }
+
+    //删除班级与残局的关联
+    public ResponseEntity<String> deleteClassBoard(Long classId,Long chessId){
+        classBoardRepository.deleteClassBoardByBoardIdAndClassId(classId,chessId);
+        return ResponseEntity.ok("删除成功");
+    }
+
+    //删除班级与学生的关联
+    public ResponseEntity<String> deleteClassStudent(Long classId,Long studentId){
+        classesStudentRepository.deleteByStudentIdAndClassId(studentId,classId);
         return ResponseEntity.ok("删除成功");
     }
 
@@ -74,6 +90,34 @@ public class ClassesService {
         List<Classes> list = classesRepository.findAllClasses(pageSize,pageSize*(number-1));
         result.setList(list);
         return ResponseEntity.ok(result);
+    }
+
+    //添加残局至班级
+    public ResponseEntity<String> saveClassBoards(List<Classes> classes,ChessBoard chessBoard){
+        List<ClassBoard> list = new ArrayList<>();
+        for(Classes cla:classes){
+            list.add(new ClassBoard(null,chessBoard,cla));
+        }
+        classBoardRepository.saveAll(list);
+        return ResponseEntity.ok("添加成功");
+    }
+
+    //添加学生至班级
+    public ResponseEntity<String> saveClassStudent(Classes classes,User student){
+        if(classes == null){
+            throw new RuntimeException("传入班级对象为null");
+        }
+        if(student == null){
+            throw new RuntimeException("传入学生对象为null");
+        }
+        Classes nowClass = classesStudentRepository.findClassByStudentId(student.getId());
+        if(nowClass == null){
+            classesStudentRepository.save(new ClassesStudent(null,classes,student));
+            return ResponseEntity.ok("添加成功");
+        }
+        else {
+            throw new RuntimeException("该学生已有班级");
+        }
     }
 
     //根据班级查找学生

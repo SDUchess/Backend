@@ -30,10 +30,26 @@ public interface ClassesStudentRepository extends JpaRepository<ClassesStudent,L
             nativeQuery = true)
     Classes findClassByStudentId(@Param("StudentId") Long StudentId);
 
-    // 删除班级与学生的关联
+    // 删除班级与学生的关联(通过班级id)
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM classes_student WHERE class_id = :classId",
             nativeQuery = true)
-    void deleteByClassId(Long classId);
+    void deleteByClassId(@Param("classId") Long classId);
+
+    //删除班级与学生的关联（通过学生id)
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM classes_student WHERE student_id = :studentId",
+            nativeQuery = true)
+    void deleteByStudentId(@Param("studentId") Long studentId);
+
+    //删除班级与学生的关联（通过学生id和班级id)
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM classes_student WHERE student_id = :studentId AND class_id = :classId",
+            nativeQuery = true)
+    void deleteByStudentIdAndClassId(@Param("studentId") Long studentId,@Param("classId") Long classId);
+
+
 }

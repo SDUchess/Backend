@@ -1,17 +1,18 @@
 package com.example.chess.controller;
 
-import com.example.chess.model.ChessBoard;
-import com.example.chess.model.Classes;
+import com.example.chess.model.*;
 import com.example.chess.model.DTO.PageResult;
-import com.example.chess.model.User;
 import com.example.chess.service.ClassesService;
 import com.example.chess.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -22,14 +23,38 @@ public class ClassesController {
 
     //新增班级
     @PostMapping("/add")
-    public ResponseEntity<Classes> saveClass(@RequestBody Classes classes){
-        return classesService.saveClass(classes);
+    public ResponseEntity<Classes> saveClass(@RequestBody Classes classes,@RequestBody User teacher){
+        return classesService.saveClass(classes,teacher);
+    }
+
+    //添加残局至班级
+    @PostMapping("/add/ChessBoardToClass")
+    public ResponseEntity<String> saveClassBoards(@RequestBody Map<String,List<Classes>> classes,@RequestBody ChessBoard chessBoard){
+        return classesService.saveClassBoards(classes.get("classes"),chessBoard);
+    }
+
+    //添加学生至班级
+    @PostMapping("/add/StudentToClass")
+    public ResponseEntity<String> saveClassStudent(@RequestBody Classes classes,@RequestBody User student){
+        return classesService.saveClassStudent(classes,student);
     }
 
     //删除班级
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteClass(@PathVariable(name = "id") Long id){
         return classesService.deleteClass(id);
+    }
+
+    //删除班级与残局的关联
+    @DeleteMapping("/delete/classWithBoard")
+    public ResponseEntity<String> deleteClassBoard(@RequestParam Long classId,@RequestParam Long chessId){
+        return classesService.deleteClassBoard(classId,chessId);
+    }
+
+    //删除班级与学生的关联
+    @DeleteMapping("/delete/classWithStudent")
+    public ResponseEntity<String> deleteClassStudent(@RequestParam Long classId,@RequestParam Long studentId){
+        return classesService.deleteClassStudent(classId,studentId);
     }
 
     //根据id查询班级
