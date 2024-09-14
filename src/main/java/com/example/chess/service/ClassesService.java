@@ -45,6 +45,9 @@ public class ClassesService {
         if(classesRepository.findById(id).isEmpty()){
             throw new RuntimeException("未找到 id 对应的班级");
         }
+        // 先删除班级与学生的关联
+        classesStudentRepository.deleteByClassId(id);
+        classesRepository.deleteById(id);
         return ResponseEntity.ok("删除成功");
     }
 

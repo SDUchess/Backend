@@ -4,8 +4,10 @@ import com.example.chess.model.Classes;
 import com.example.chess.model.ClassesStudent;
 import com.example.chess.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,4 +30,10 @@ public interface ClassesStudentRepository extends JpaRepository<ClassesStudent,L
             nativeQuery = true)
     Classes findClassByStudentId(@Param("StudentId") Long StudentId);
 
+    // 删除班级与学生的关联
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM classes_student WHERE class_id = :classId",
+            nativeQuery = true)
+    void deleteByClassId(Long classId);
 }
