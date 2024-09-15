@@ -17,11 +17,8 @@ public interface TeacherClassesRepository extends JpaRepository<TeacherClasses,L
     //用的自带的
 
     //根据教师查找班级
-    @Query(value = "SELECT c.* " +
-            "FROM classes c LEFT JOIN teacher_classes tc ON tc.class_id = c.id " +
-            "WHERE tc.teacher_id = :id",
-            nativeQuery = true)
-    List<Classes> findClassesByTeacherId(@Param("id") Long id);
+    @Query(value = "select tc.classes from TeacherClasses tc where tc.teacher.id = :id")
+    List<Classes> findClassesByTeacherId(Long id);
 
     //根据班级查找教师
     @Query(value = "SELECT u.* " +
@@ -40,14 +37,14 @@ public interface TeacherClassesRepository extends JpaRepository<TeacherClasses,L
     //删除老师与班级的关联(通过老师id)
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM teacher_classes WHERE teacher_id = :TeacherId",
+    @Query(value = "DELETE FROM teacher_classes WHERE teacher_id = :teacherId",
             nativeQuery = true)
     void deleteByTeacherId(@Param("teacherId") Long id);
 
     //删除老师与班级的关联(通过老师id和班级id)
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM teacher_classes WHERE teacher_id = :TeacherId AND class_id = :classId",
+    @Query(value = "DELETE FROM teacher_classes WHERE teacher_id = :teacherId AND class_id = :classId",
             nativeQuery = true)
     void deleteByTeacherIdAndClassId(@Param("teacherId") Long teacherId,@Param("classId") Long classId);
 

@@ -2,12 +2,10 @@ package com.example.chess.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Getter
 @Setter
 @ToString
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
