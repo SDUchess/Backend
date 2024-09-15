@@ -18,8 +18,8 @@ public class ClassesController {
 
     //新增班级
     @PostMapping("/add")
-    public ResponseEntity<Classes> saveClass(@RequestBody Classes classes,@RequestBody User teacher){
-        return classesService.saveClass(classes,teacher);
+    public ResponseEntity<Classes> saveClass(@RequestBody TeacherClasses teacherClasses){
+        return classesService.saveClass(teacherClasses);
     }
 
     //添加残局至班级
