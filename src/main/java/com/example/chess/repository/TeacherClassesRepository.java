@@ -17,11 +17,8 @@ public interface TeacherClassesRepository extends JpaRepository<TeacherClasses,L
     //用的自带的
 
     //根据教师查找班级
-    @Query(value = "SELECT c.* " +
-            "FROM classes c LEFT JOIN teacher_classes tc ON tc.class_id = c.id " +
-            "WHERE tc.teacher_id = :id",
-            nativeQuery = true)
-    List<Classes> findClassesByTeacherId(@Param("id") Long id);
+    @Query(value = "select tc.classes from TeacherClasses tc where tc.teacher.id = :id")
+    List<Classes> findClassesByTeacherId(Long id);
 
     //根据班级查找教师
     @Query(value = "SELECT u.* " +

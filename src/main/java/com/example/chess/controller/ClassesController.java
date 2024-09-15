@@ -4,17 +4,12 @@ import com.example.chess.model.*;
 import com.example.chess.model.DTO.ClassesBoardDTO;
 import com.example.chess.model.DTO.PageResult;
 import com.example.chess.service.ClassesService;
-import com.example.chess.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/class")
