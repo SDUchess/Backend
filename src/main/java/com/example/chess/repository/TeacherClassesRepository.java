@@ -40,14 +40,14 @@ public interface TeacherClassesRepository extends JpaRepository<TeacherClasses,L
     //删除老师与班级的关联(通过老师id)
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM teacher_classes WHERE teacher_id = :TeacherId",
+    @Query(value = "DELETE FROM teacher_classes WHERE teacher_id = :teacherId",
             nativeQuery = true)
     void deleteByTeacherId(@Param("teacherId") Long id);
 
     //删除老师与班级的关联(通过老师id和班级id)
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM teacher_classes WHERE teacher_id = :TeacherId AND class_id = :classId",
+    @Query(value = "DELETE FROM teacher_classes WHERE teacher_id = :teacherId AND class_id = :classId",
             nativeQuery = true)
     void deleteByTeacherIdAndClassId(@Param("teacherId") Long teacherId,@Param("classId") Long classId);
 

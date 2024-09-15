@@ -28,7 +28,9 @@ public class ClassesService {
     private TeacherClassesRepository teacherClassesRepository;
 
     //新增班级(会顺便添加教师与班级的关联)
-    public ResponseEntity<Classes> saveClass(Classes classes,User teacher){
+    public ResponseEntity<Classes> saveClass(TeacherClasses teacherClasses){
+        Classes classes = teacherClasses.getClasses();
+        User teacher = teacherClasses.getTeacher();
         if(classesRepository.findByName(classes.getName()).isPresent()){
             throw new RuntimeException("班级名称重复");
         }
