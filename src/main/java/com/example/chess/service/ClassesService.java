@@ -27,6 +27,9 @@ public class ClassesService {
     @Autowired
     private TeacherClassesRepository teacherClassesRepository;
 
+    @Autowired
+    private ChessBoardRepository chessBoardRepository;
+
     //新增班级(会顺便添加教师与班级的关联)
     public ResponseEntity<Classes> saveClass(TeacherClasses teacherClasses){
         Classes classes = teacherClasses.getClasses();
@@ -95,8 +98,9 @@ public class ClassesService {
     }
 
     //添加残局至班级
-    public ResponseEntity<String> saveClassBoards(List<Classes> classes,ChessBoard chessBoard){
+    public ResponseEntity<String> saveClassBoards(List<Classes> classes,ChessBoard oldChessBoard){
         List<ClassBoard> list = new ArrayList<>();
+        ChessBoard chessBoard = chessBoardRepository.findById(oldChessBoard.getId()).get();
         for(Classes cla:classes){
             list.add(new ClassBoard(null,chessBoard,cla));
         }
@@ -105,7 +109,9 @@ public class ClassesService {
     }
 
     //添加学生至班级
-    public ResponseEntity<String> saveClassStudent(Classes classes,User student){
+    public ResponseEntity<String> saveClassStudent(ClassesStudent classesStudent){
+        Classes classes = classesStudent.getClasses();
+        User student = classesStudent.getStudent();
         if(classes == null){
             throw new RuntimeException("传入班级对象为null");
         }

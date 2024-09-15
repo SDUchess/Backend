@@ -1,6 +1,7 @@
 package com.example.chess.controller;
 
 import com.example.chess.model.*;
+import com.example.chess.model.DTO.ClassesBoardDTO;
 import com.example.chess.model.DTO.PageResult;
 import com.example.chess.service.ClassesService;
 import com.example.chess.service.UserService;
@@ -29,14 +30,14 @@ public class ClassesController {
 
     //添加残局至班级
     @PostMapping("/add/ChessBoardToClass")
-    public ResponseEntity<String> saveClassBoards(@RequestBody Map<String,List<Classes>> classes,@RequestBody ChessBoard chessBoard){
-        return classesService.saveClassBoards(classes.get("classes"),chessBoard);
+    public ResponseEntity<String> saveClassBoards(@RequestBody ClassesBoardDTO classesBoard){
+        return classesService.saveClassBoards(classesBoard.getClasses(),classesBoard.getChessBoard());
     }
 
     //添加学生至班级
     @PostMapping("/add/StudentToClass")
-    public ResponseEntity<String> saveClassStudent(@RequestBody Classes classes,@RequestBody User student){
-        return classesService.saveClassStudent(classes,student);
+    public ResponseEntity<String> saveClassStudent(@RequestBody ClassesStudent classesStudent){
+        return classesService.saveClassStudent(classesStudent);
     }
 
     //删除班级
