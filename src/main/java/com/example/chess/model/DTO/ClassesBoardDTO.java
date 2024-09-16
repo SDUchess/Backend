@@ -12,6 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class ClassesBoardDTO {
-    List<Classes> classes;
-    ChessBoard chessBoard;
+    List<Long> classesIds;
+    Long chessBoardId;
 }

@@ -26,7 +26,7 @@ public class ClassesController {
     //添加残局至班级
     @PostMapping("/add/ChessBoardToClass")
     public ResponseEntity<String> saveClassBoards(@RequestBody ClassesBoardDTO classesBoard){
-        return classesService.saveClassBoards(classesBoard.getClasses(),classesBoard.getChessBoard());
+        return classesService.saveClassBoards(classesBoard.getClassesIds(),classesBoard.getChessBoardId());
     }
 
     //添加学生至班级

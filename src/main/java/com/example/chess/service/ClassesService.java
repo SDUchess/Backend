@@ -97,11 +97,19 @@ public class ClassesService {
     }
 
     //添加残局至班级
-    public ResponseEntity<String> saveClassBoards(List<Classes> classes,ChessBoard oldChessBoard){
+    public ResponseEntity<String> saveClassBoards(List<Long> classesIds,Long chessBoardId){
         List<ClassBoard> list = new ArrayList<>();
-        ChessBoard chessBoard = chessBoardRepository.findById(oldChessBoard.getId()).get();
-        for(Classes cla:classes){
-            list.add(new ClassBoard(null,chessBoard,cla));
+
+        Optional<ChessBoard> chessBoard = chessBoardRepository.findById(chessBoardId);
+        if(chessBoard.isEmpty()){
+            throw new RuntimeException("未找到对应棋盘");
+        }
+        for(Long cla:classesIds){
+            Optional<Classes> classes = classesRepository.findById(cla);
+            if(classes.isEmpty()){
+                throw new RuntimeException("id 为 "+ cla +" 的班级未找到");
+            }
+            list.add(new ClassBoard(null,chessBoard.get(),classes.get()));
         }
         classBoardRepository.saveAll(list);
         return ResponseEntity.ok("添加成功");
