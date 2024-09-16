@@ -1,16 +1,15 @@
 package com.example.chess.service;
 
 import com.example.chess.model.*;
-import com.example.chess.repository.ChessBoardRepository;
-import com.example.chess.repository.ChessMoveRepository;
-import com.example.chess.repository.ClassBoardRepository;
-import com.example.chess.repository.TeacherStudentRepository;
+import com.example.chess.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +26,9 @@ public class ChessBoardService {
 
     @Autowired
     private ClassBoardRepository classBoardRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public ChessBoard saveChessBoard(ChessBoard chessBoard) {
         return chessBoardRepository.save(chessBoard);
@@ -50,10 +52,8 @@ public class ChessBoardService {
         if(teacherId == null){
             throw new RuntimeException("传入 id 为空值");
         }
-        return ResponseEntity.ok(chessBoardRepository.findByTeacherId(teacherId));
+        return ResponseEntity.ok(chessBoardRepository.findByPublisherId(teacherId));
     }
-
-
 
     public List<ChessboardDTO> getAllChessboardsWithMoveCount() {
         List<ChessBoard> chessboards = chessBoardRepository.findAll();
@@ -82,5 +82,18 @@ public class ChessBoardService {
                 .map(User::getId)
                 .collect(Collectors.toList());
         return chessBoardRepository.findByTeacherIds(teacherIds);
+    }
+
+    //获取管理员题库
+    public ResponseEntity<List<ChessBoard>> getAllChessBoardsOfAdmin(Long adminId){
+        Optional<User> optionalUser = userRepository.findById(adminId);
+        if(optionalUser.isEmpty()){
+            throw new RuntimeException("未找到该管理员");
+        }
+        if (!Objects.equals(optionalUser.get().getRole(), "admin")){
+            throw new RuntimeException("该 id 不是管理员的id");
+        }
+        List<ChessBoard> list = chessBoardRepository.findAllOfAdmin(adminId);
+        return ResponseEntity.ok(list);
     }
 }

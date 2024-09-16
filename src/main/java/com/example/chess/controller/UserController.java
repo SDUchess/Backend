@@ -1,5 +1,6 @@
 package com.example.chess.controller;
 
+import com.example.chess.model.StudentChess;
 import com.example.chess.model.User;
 import com.example.chess.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -63,6 +65,12 @@ public class UserController {
     public ResponseEntity<?> removeStudentFromTeacher(@PathVariable Long teacherId, @PathVariable Long studentId) {
         userService.removeStudentFromTeacher(teacherId, studentId);
         return ResponseEntity.ok().body("学生已成功从管理列表中删除");
+    }
+
+    //计算一个学生的得分
+    @GetMapping("/student/getScoreById")
+    public ResponseEntity<Long> calculateScore(@RequestParam Long studentId){
+        return userService.calculateScore(studentId);
     }
 
 }

@@ -22,5 +22,10 @@ public class ChessBoard {
     @Column(columnDefinition = "TEXT")
     private String initialBoard; // Store as JSON string
 
-    private Long teacherId;
+    @ManyToOne
+    @JoinColumn(name = "publisher_id")
+    private User publisher;
+
+    //得分
+    private Long score;
 }

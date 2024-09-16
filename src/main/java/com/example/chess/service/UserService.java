@@ -1,14 +1,18 @@
 package com.example.chess.service;
 
+import com.example.chess.model.StudentChess;
 import com.example.chess.model.TeacherStudent;
 import com.example.chess.model.User;
 import com.example.chess.repository.ClassesStudentRepository;
+import com.example.chess.repository.StudentChessRepository;
 import com.example.chess.repository.TeacherStudentRepository;
 import com.example.chess.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +25,9 @@ public class UserService {
 
     @Autowired
     private ClassesStudentRepository classesStudentRepository;
+
+    @Autowired
+    private StudentChessRepository studentChessRepository;
 
     public User saveUser(User user) {
         return userRepository.save(user);
@@ -68,5 +75,19 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("未找到该学生与教师的关联"));
         classesStudentRepository.deleteByStudentId(studentId);
         teacherStudentRepository.delete(teacherStudent);
+    }
+
+    //计算一个学生的得分
+    public ResponseEntity<Long> calculateScore(Long studentId){
+        Optional<User> student = userRepository.findById(studentId);
+        if(student.isEmpty()){
+            throw new RuntimeException("未找到对应学生");
+        }
+        List<StudentChess> list = studentChessRepository.findByStudentId(studentId);
+        Long sum = 0L;
+        for(StudentChess sc : list){
+            sum += sc.getChessBoard().getScore();
+        }
+        return ResponseEntity.ok(sum);
     }
 }

@@ -3,12 +3,15 @@ package com.example.chess.controller;
 import com.example.chess.model.ChessBoard;
 import com.example.chess.model.ChessMove;
 import com.example.chess.model.ChessboardDTO;
+import com.example.chess.model.User;
 import com.example.chess.service.ChessBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/chessboard")
@@ -64,4 +67,11 @@ public class ChessBoardController {
     public List<ChessBoard> getChessboardsForStudent(@PathVariable Long studentId) {
         return chessBoardService.getChessboardsForStudent(studentId);
     }
+
+    //获取管理员题库
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<ChessBoard>> getAllChessBoardsOfAdmin(@RequestParam Long adminId){
+        return chessBoardService.getAllChessBoardsOfAdmin(adminId);
+    }
+
 }
