@@ -29,6 +29,9 @@ public class ClassesService {
     @Autowired
     private ChessBoardRepository chessBoardRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     //新增班级(会顺便添加教师与班级的关联)
     public ResponseEntity<Classes> saveClass(TeacherClasses teacherClasses){
         Classes classes = teacherClasses.getClasses();
@@ -116,18 +119,18 @@ public class ClassesService {
     }
 
     //添加学生至班级
-    public ResponseEntity<String> saveClassStudent(ClassesStudent classesStudent){
-        Classes classes = classesStudent.getClasses();
-        User student = classesStudent.getStudent();
-        if(classes == null){
-            throw new RuntimeException("传入班级对象为null");
+    public ResponseEntity<String> saveClassStudent(Long classesId,Long studentId){
+        Optional<Classes> classes = classesRepository.findById(classesId);
+        Optional<User> student = userRepository.findById(studentId);
+        if(classes.isEmpty()){
+            throw new RuntimeException("未找到对应班级");
         }
-        if(student == null){
-            throw new RuntimeException("传入学生对象为null");
+        if(student.isEmpty()){
+            throw new RuntimeException("未找到对应学生");
         }
-        Classes nowClass = classesStudentRepository.findClassByStudentId(student.getId());
+        Classes nowClass = classesStudentRepository.findClassByStudentId(studentId);
         if(nowClass == null){
-            classesStudentRepository.save(new ClassesStudent(null,classes,student));
+            classesStudentRepository.save(new ClassesStudent(null,classes.get(),student.get()));
             return ResponseEntity.ok("添加成功");
         }
         else {

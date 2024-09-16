@@ -31,8 +31,8 @@ public class ClassesController {
 
     //添加学生至班级
     @PostMapping("/add/StudentToClass")
-    public ResponseEntity<String> saveClassStudent(@RequestBody ClassesStudent classesStudent){
-        return classesService.saveClassStudent(classesStudent);
+    public ResponseEntity<String> saveClassStudent(@RequestParam Long classesId,@RequestParam Long studentId){
+        return classesService.saveClassStudent(classesId,studentId);
     }
 
     //删除班级
