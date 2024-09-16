@@ -14,18 +14,12 @@ import java.util.List;
 public interface ClassBoardRepository extends JpaRepository<ClassBoard,Long> {
 
     //根据班级查找残局
-    @Query(value = "SELECT b.* " +
-            "FROM chessboards AS b LEFT JOIN class_board AS cb ON b.id = cb.board_id " +
-            "WHERE cb.class_id = :ClassId",
-            nativeQuery = true)
-    List<ChessBoard> findChessBoardByClassesId(@Param("ClassId") Long ClassId);
+    @Query(value = "select cb.chessBoard from ClassBoard cb where cb.classes.id = :classId")
+    List<ChessBoard> findChessBoardByClassesId(Long classId);
 
     //根据残局查找班级
-    @Query(value = "SELECT c.* " +
-            "FROM classes AS c LEFT JOIN class_board AS cb ON c.id = cb.class_id " +
-            "WHERE cb.board_id = :id",
-            nativeQuery = true)
-    List<Classes> findClassesByChessBoardId(@Param("id") Long id);
+    @Query(value = "select cb.classes from ClassBoard cb where cb.chessBoard.id = :boardId")
+    List<Classes> findClassesByChessBoardId(Long boardId);
 
     //删除班级与残局的关联（通过班级id)
     @Modifying

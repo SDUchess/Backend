@@ -17,18 +17,12 @@ public interface ClassesStudentRepository extends JpaRepository<ClassesStudent,L
     //用的自带的
 
     //根据班级查找学生
-    @Query(value = "SELECT u.* " +
-            "FROM users u LEFT JOIN classes_student cs ON u.id = cs.student_id " +
-            "WHERE cs.class_id = :classId",
-            nativeQuery = true)
-    List<User> findStudentByClassesId(@Param("classId") Long classId);
+    @Query(value = "select cs.student from ClassesStudent cs where cs.classes.id = :classId")
+    List<User> findStudentByClassesId(Long classId);
 
     //根据学生查找班级
-    @Query(value = "SELECT c.* " +
-            "FROM classes as c LEFT JOIN classes_student cs  ON cs.class_id = c.id " +
-            "WHERE cs.student_id = :StudentId",
-            nativeQuery = true)
-    Classes findClassByStudentId(@Param("StudentId") Long StudentId);
+    @Query(value = "select cs.classes from ClassesStudent cs where cs.student.id = :studentId")
+    Classes findClassByStudentId(Long studentId);
 
     // 删除班级与学生的关联(通过班级id)
     @Modifying

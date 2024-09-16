@@ -1,9 +1,6 @@
 package com.example.chess.service;
 
-import com.example.chess.model.ChessBoard;
-import com.example.chess.model.ChessMove;
-import com.example.chess.model.ChessboardDTO;
-import com.example.chess.model.TeacherStudent;
+import com.example.chess.model.*;
 import com.example.chess.repository.ChessBoardRepository;
 import com.example.chess.repository.ChessMoveRepository;
 import com.example.chess.repository.ClassBoardRepository;
@@ -82,7 +79,7 @@ public class ChessBoardService {
         List<TeacherStudent> teacherStudentList = teacherStudentRepository.findByStudentId(studentId);
         List<Long> teacherIds = teacherStudentList.stream()
                 .map(TeacherStudent::getTeacher)
-                .map(teacher -> teacher.getId())
+                .map(User::getId)
                 .collect(Collectors.toList());
         return chessBoardRepository.findByTeacherIds(teacherIds);
     }
