@@ -85,15 +85,8 @@ public class ChessBoardService {
     }
 
     //获取管理员题库
-    public ResponseEntity<List<ChessBoard>> getAllChessBoardsOfAdmin(Long adminId){
-        Optional<User> optionalUser = userRepository.findById(adminId);
-        if(optionalUser.isEmpty()){
-            throw new RuntimeException("未找到该管理员");
-        }
-        if (!Objects.equals(optionalUser.get().getRole(), "admin")){
-            throw new RuntimeException("该 id 不是管理员的id");
-        }
-        List<ChessBoard> list = chessBoardRepository.findAllOfAdmin(adminId);
+    public ResponseEntity<List<ChessBoard>> getAllChessBoardsOfAdmin(){
+        List<ChessBoard> list = chessBoardRepository.findAllOfAdmin();
         return ResponseEntity.ok(list);
     }
 }

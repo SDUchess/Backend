@@ -70,8 +70,8 @@ public class ChessBoardController {
 
     //获取管理员题库
     @GetMapping("/admin/all")
-    public ResponseEntity<List<ChessBoard>> getAllChessBoardsOfAdmin(@RequestParam Long adminId){
-        return chessBoardService.getAllChessBoardsOfAdmin(adminId);
+    public ResponseEntity<List<ChessBoard>> getAllChessBoardsOfAdmin(){
+        return chessBoardService.getAllChessBoardsOfAdmin();
     }
 
 }

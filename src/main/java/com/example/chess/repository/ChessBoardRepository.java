@@ -14,7 +14,7 @@ public interface ChessBoardRepository extends JpaRepository<ChessBoard, Long> {
     List<ChessBoard> findByPublisherId(Long publisherId);
 
     //获取管理员题库
-    @Query("SELECT ChessBoard FROM ChessBoard cb WHERE cb.publisher.role = 'admin' ")
-    List<ChessBoard> findAllOfAdmin(@Param("adminId") Long adminId);
+    @Query("FROM ChessBoard cb WHERE cb.publisher.role = 'admin' ")
+    List<ChessBoard> findAllOfAdmin();
 }
 
