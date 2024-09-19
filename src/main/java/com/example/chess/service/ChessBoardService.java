@@ -2,7 +2,9 @@ package com.example.chess.service;
 
 import com.example.chess.model.*;
 import com.example.chess.repository.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ChessBoardService {
 
@@ -29,6 +32,9 @@ public class ChessBoardService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private StudentChessRepository studentChessRepository;
 
     public ChessBoard saveChessBoard(ChessBoard chessBoard) {
         return chessBoardRepository.save(chessBoard);
@@ -56,7 +62,7 @@ public class ChessBoardService {
     }
 
     public List<ChessboardDTO> getAllChessboardsWithMoveCount() {
-        List<ChessBoard> chessboards = chessBoardRepository.findAll();
+        List<ChessBoard> chessboards = chessBoardRepository.findAllOfTeacher();
         return chessboards.stream().map(chessboard -> {
             int moveCount = chessMoveRepository.countByChessboardId(chessboard.getId());
             return new ChessboardDTO(chessboard, moveCount);
@@ -88,5 +94,14 @@ public class ChessBoardService {
     public ResponseEntity<List<ChessBoard>> getAllChessBoardsOfAdmin(){
         List<ChessBoard> list = chessBoardRepository.findAllOfAdmin();
         return ResponseEntity.ok(list);
+    }
+
+    // 学生完成挑战
+    public ResponseEntity<String> finishChessboard(StudentChess studentChess) {
+        // 重复完成题目不会继续增加积分
+        if (!studentChessRepository.exists(Example.of(studentChess))) {
+            studentChessRepository.save(studentChess);
+        }
+        return ResponseEntity.ok("ok");
     }
 }

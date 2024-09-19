@@ -1,9 +1,6 @@
 package com.example.chess.controller;
 
-import com.example.chess.model.ChessBoard;
-import com.example.chess.model.ChessMove;
-import com.example.chess.model.ChessboardDTO;
-import com.example.chess.model.User;
+import com.example.chess.model.*;
 import com.example.chess.service.ChessBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -68,10 +65,15 @@ public class ChessBoardController {
         return chessBoardService.getChessboardsForStudent(studentId);
     }
 
-    //获取管理员题库
+    // 获取管理员题库
     @GetMapping("/admin/all")
     public ResponseEntity<List<ChessBoard>> getAllChessBoardsOfAdmin(){
         return chessBoardService.getAllChessBoardsOfAdmin();
     }
 
+    // 学生完成题目
+    @PostMapping("/finish")
+    public ResponseEntity<String> finishChessboard(@RequestBody StudentChess studentChess) {
+        return chessBoardService.finishChessboard(studentChess);
+    }
 }

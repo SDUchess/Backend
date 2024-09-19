@@ -8,11 +8,13 @@ public class ChessboardDTO {
     private String name;
     private int moveCount;
     private String description;
+    private Long score;
 
     public ChessboardDTO(ChessBoard chessboard, int moveCount) {
         this.id = chessboard.getId();
         this.name = chessboard.getName();
         this.moveCount = moveCount;
         this.description = chessboard.getDescription();
+        this.score = chessboard.getScore();
     }
 }
