@@ -72,4 +72,28 @@ public class UserController {
         return userService.calculateScore(studentId);
     }
 
+    //管理员增加用户
+    @PostMapping("/admin/addUser")
+    public ResponseEntity<User> addUser(@RequestBody User user) {
+        return userService.addUser(user);
+    }
+
+    //管理员根据id删除用户
+    @DeleteMapping("/admin/deleteById")
+    public ResponseEntity<String> deleteUserById(@RequestParam Long id){
+        return userService.deleteUserById(id);
+    }
+
+    //管理员获取所有用户
+    @GetMapping("/admin/getAll")
+    public ResponseEntity<List<User>> findAllUser(){
+        return userService.findAllUser();
+    }
+
+    //管理员根据id修改用户
+    @PostMapping("/admin/updateUser")
+    public ResponseEntity<User> updateUser(@RequestBody User newUser){
+        return userService.updateUser(newUser);
+    }
+
 }

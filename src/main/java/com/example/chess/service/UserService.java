@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -90,4 +91,67 @@ public class UserService {
         }
         return ResponseEntity.ok(sum);
     }
+
+    //管理员增加用户
+    public ResponseEntity<User> addUser(User user){
+        if(user == null){
+            throw new RuntimeException("传入 user 为 null");
+        }
+        if(getUserByUsername(user.getUsername()) != null){
+            throw new RuntimeException("用户名重复");
+        }
+        if(!(Objects.equals(user.getRole(), "student") || Objects.equals(user.getRole(), "teacher") || Objects.equals(user.getRole(), "admin"))){
+            throw new RuntimeException("role 字段应为 'student' 或 'teacher' 或 'admin' ");
+        }
+        user = userRepository.save(user);
+        return ResponseEntity.ok(user);
+    }
+
+
+    //管理员根据id删除用户
+    public ResponseEntity<String> deleteUserById(Long id){
+        if(id == null){
+            throw new RuntimeException("传入 id 为空值");
+        }
+        Optional<User> optionalUser = userRepository.findById(id);
+        if(optionalUser.isEmpty()){
+            throw new RuntimeException("未找到对应 user");
+        }
+        userRepository.deleteById(id);
+        return ResponseEntity.ok("删除成功");
+    }
+
+    //管理员获取所有用户
+    public ResponseEntity<List<User>> findAllUser(){
+        List<User> list = userRepository.findAll();
+        for(User user:list){
+            user.setPassword(null);
+        }
+        return ResponseEntity.ok(list);
+    }
+
+    //管理员根据id修改用户
+    public ResponseEntity<User> updateUser(User newUser){
+        if(newUser == null){
+            throw new RuntimeException("传入 user 为 null");
+        }
+        if(!(Objects.equals(newUser.getRole(), "student") || Objects.equals(newUser.getRole(), "teacher") || Objects.equals(newUser.getRole(), "admin"))){
+            throw new RuntimeException("role 字段应为 'student' 或 'teacher' 或 'admin' ");
+        }
+
+        if(newUser.getId() == null){
+            throw new RuntimeException("传入 user 的 id 为空值");
+        }
+        Optional<User> optionalUser = userRepository.findById(newUser.getId());
+        if(optionalUser.isEmpty()){
+            throw new RuntimeException("未找到对应 user");
+        }
+        if(!Objects.equals(optionalUser.get().getUsername(), newUser.getUsername()) && getUserByUsername(newUser.getUsername()) != null){
+            throw new RuntimeException("用户名重复");
+        }
+        newUser = userRepository.save(newUser);
+        return ResponseEntity.ok(newUser);
+    }
+
+
 }
