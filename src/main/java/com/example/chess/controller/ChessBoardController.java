@@ -1,6 +1,7 @@
 package com.example.chess.controller;
 
 import com.example.chess.model.*;
+import com.example.chess.model.DTO.StudentDTO;
 import com.example.chess.service.ChessBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -75,5 +76,11 @@ public class ChessBoardController {
     @PostMapping("/finish")
     public ResponseEntity<String> finishChessboard(@RequestBody StudentChess studentChess) {
         return chessBoardService.finishChessboard(studentChess);
+    }
+
+    // 获取积分排行榜
+    @GetMapping("/rank")
+    public List<StudentDTO> rankByScore() {
+        return chessBoardService.rankByScore();
     }
 }

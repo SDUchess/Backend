@@ -1,6 +1,7 @@
 package com.example.chess.service;
 
 import com.example.chess.model.*;
+import com.example.chess.model.DTO.StudentDTO;
 import com.example.chess.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,5 +104,10 @@ public class ChessBoardService {
             studentChessRepository.save(studentChess);
         }
         return ResponseEntity.ok("ok");
+    }
+
+    // 获取积分排行榜
+    public List<StudentDTO> rankByScore() {
+        return studentChessRepository.rankByScore();
     }
 }
