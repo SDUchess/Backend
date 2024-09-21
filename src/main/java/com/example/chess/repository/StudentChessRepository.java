@@ -2,11 +2,11 @@ package com.example.chess.repository;
 
 import com.example.chess.model.DTO.StudentDTO;
 import com.example.chess.model.StudentChess;
-import com.example.chess.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -37,4 +37,9 @@ public interface StudentChessRepository extends JpaRepository<StudentChess, Long
             "group by student.id " +
             "order by sum(c.score) desc")
     List<StudentDTO> rankByScore();
+
+    @Transactional
+    @Modifying
+    @Query("delete from StudentChess where chessBoard.id = :boardId")
+    void deleteByBoardId(Long boardId);
 }

@@ -73,7 +73,10 @@ public class ChessBoardService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteChessboard(Long id) {
         deleteChessMovesByChessboardId(id);
+        // 删除残局和班级的关联
         classBoardRepository.deleteClassBoardByBoardId(id);
+        // 删除残局和学生的关联(学生的做题记录)
+        studentChessRepository.deleteByBoardId(id);
         chessBoardRepository.deleteById(id);
     }
 
