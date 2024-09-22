@@ -90,6 +90,12 @@ public class UserController {
         return userService.findAllUser();
     }
 
+    // 管理员获取指定类型的用户
+    @GetMapping("/admin/getUser")
+    public ResponseEntity<List<User>> getUserByRole(@RequestParam String role){
+        return userService.getUserByRole(role);
+    }
+
     //管理员根据id修改用户
     @PostMapping("/admin/updateUser")
     public ResponseEntity<User> updateUser(@RequestBody User newUser){

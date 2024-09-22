@@ -3,19 +3,19 @@ package com.example.chess.service;
 import com.example.chess.model.StudentChess;
 import com.example.chess.model.TeacherStudent;
 import com.example.chess.model.User;
-import com.example.chess.repository.ClassesStudentRepository;
-import com.example.chess.repository.StudentChessRepository;
-import com.example.chess.repository.TeacherStudentRepository;
-import com.example.chess.repository.UserRepository;
+import com.example.chess.repository.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserService {
     @Autowired
@@ -29,6 +29,14 @@ public class UserService {
 
     @Autowired
     private StudentChessRepository studentChessRepository;
+    @Autowired
+    private TeacherClassesRepository teacherClassesRepository;
+    @Autowired
+    private ChessBoardRepository chessBoardRepository;
+    @Autowired
+    private ClassesService classesService;
+    @Autowired
+    private ChessBoardService chessBoardService;
 
     public User saveUser(User user) {
         return userRepository.save(user);
@@ -109,6 +117,7 @@ public class UserService {
 
 
     //管理员根据id删除用户
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<String> deleteUserById(Long id){
         if(id == null){
             throw new RuntimeException("传入 id 为空值");
@@ -117,6 +126,16 @@ public class UserService {
         if(optionalUser.isEmpty()){
             throw new RuntimeException("未找到对应 user");
         }
+        // 如果是学生, 删除学生与班级的关联以及学生的做题记录
+        if(Objects.equals(optionalUser.get().getRole(), "student")){
+            classesStudentRepository.deleteByStudentId(id);
+            studentChessRepository.deleteByStudentId(id);
+        }
+        // 如果是教师, 删除教师管理的班级以及教师发布的残局
+        if(Objects.equals(optionalUser.get().getRole(), "teacher")){
+            teacherClassesRepository.findClassesByTeacherId(id).forEach(classes -> classesService.deleteClass(classes.getId()));
+            chessBoardService.deleteChessboardsByTeacherId(id);
+        }
         userRepository.deleteById(id);
         return ResponseEntity.ok("删除成功");
     }
@@ -124,6 +143,18 @@ public class UserService {
     //管理员获取所有用户
     public ResponseEntity<List<User>> findAllUser(){
         List<User> list = userRepository.findAll();
+        for(User user:list){
+            user.setPassword(null);
+        }
+        return ResponseEntity.ok(list);
+    }
+
+    // 管理员获取特定类型的用户
+    public ResponseEntity<List<User>> getUserByRole(String role) {
+        if(!(Objects.equals(role, "student") || Objects.equals(role, "teacher") || Objects.equals(role, "admin"))){
+            throw new RuntimeException("role 字段应为 'student' 或 'teacher' 或 'admin' ");
+        }
+        List<User> list = userRepository.findByRole(role);
         for(User user:list){
             user.setPassword(null);
         }

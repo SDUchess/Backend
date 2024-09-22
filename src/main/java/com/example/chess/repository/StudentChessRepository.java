@@ -42,4 +42,9 @@ public interface StudentChessRepository extends JpaRepository<StudentChess, Long
     @Modifying
     @Query("delete from StudentChess where chessBoard.id = :boardId")
     void deleteByBoardId(Long boardId);
+
+    @Transactional
+    @Modifying
+    @Query("delete from StudentChess where student.id = :studentId")
+    void deleteByStudentId(Long studentId);
 }

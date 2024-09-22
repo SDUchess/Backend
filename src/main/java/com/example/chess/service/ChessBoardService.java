@@ -80,6 +80,15 @@ public class ChessBoardService {
         chessBoardRepository.deleteById(id);
     }
 
+    // 根据教师id删除其所有残局
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteChessboardsByTeacherId(Long teacherId) {
+        List<ChessBoard> chessboards = chessBoardRepository.findByPublisherId(teacherId);
+        for (ChessBoard chessboard : chessboards) {
+            deleteChessboard(chessboard.getId());
+        }
+    }
+
     public void deleteChessMovesByChessboardId(Long chessboardId) {
         List<ChessMove> moves = chessMoveRepository.findByChessboardIdOrderByMoveOrderAsc(chessboardId);
         chessMoveRepository.deleteAll(moves);
