@@ -180,7 +180,14 @@ public class UserService {
         if(!Objects.equals(optionalUser.get().getUsername(), newUser.getUsername()) && getUserByUsername(newUser.getUsername()) != null){
             throw new RuntimeException("用户名重复");
         }
-        newUser = userRepository.save(newUser);
+        User u = optionalUser.get();
+        if (newUser.getUsername() != null) {
+            u.setUsername(newUser.getUsername());
+        }
+        if (newUser.getPassword() != null) {
+            u.setPassword(newUser.getPassword());
+        }
+        newUser = userRepository.save(u);
         return ResponseEntity.ok(newUser);
     }
 
