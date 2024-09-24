@@ -79,8 +79,8 @@ public class ClassesController {
 
     //根据班级查找残局
     @GetMapping("/get/chessboardByClassId")
-    public ResponseEntity<List<ChessBoard>> findChessBoardsByClass(@RequestParam Long id){
-        return classesService.findChessBoardsByClass(id);
+    public ResponseEntity<List<ChessboardDTO>> findChessBoardsByClass(@RequestParam Long id, @RequestParam String role, @RequestParam(required = false) Long studentId){
+        return classesService.findChessBoardsByClass(id, role, studentId);
     }
 
     //根据残局查找班级

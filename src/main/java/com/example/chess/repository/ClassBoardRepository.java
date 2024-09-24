@@ -1,6 +1,6 @@
 package com.example.chess.repository;
 
-import com.example.chess.model.ChessBoard;
+import com.example.chess.model.ChessboardDTO;
 import com.example.chess.model.ClassBoard;
 import com.example.chess.model.Classes;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,9 +13,17 @@ import java.util.List;
 
 public interface ClassBoardRepository extends JpaRepository<ClassBoard,Long> {
 
-    //根据班级查找残局
-    @Query(value = "select cb.chessBoard from ClassBoard cb where cb.classes.id = :classId")
-    List<ChessBoard> findChessBoardByClassesId(Long classId);
+    // 教师根据班级查找残局
+    @Query(value = "select new com.example.chess.model.ChessboardDTO(cb.chessBoard) from ClassBoard cb where cb.classes.id = :classId")
+    List<ChessboardDTO> findChessBoardByClassesId(Long classId);
+
+    // 学生根据班级查找残局. 计算是否已经完成过挑战
+    @Query(value = "select new com.example.chess.model.ChessboardDTO(cb.chessBoard, case when sc.id is null then false else true end) " +
+            "from ClassBoard cb " +
+            "   left join StudentChess sc on cb.chessBoard.id = sc.chessBoard.id " +
+            "                             and sc.student.id = :studentId " +
+            "where cb.classes.id = :classId")
+    List<ChessboardDTO> findChessBoardByClassesIdAndStudentId(Long classId, Long studentId);
 
     //根据残局查找班级
     @Query(value = "select cb.classes from ClassBoard cb where cb.chessBoard.id = :boardId")

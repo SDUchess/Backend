@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/chessboard")
@@ -44,12 +42,6 @@ public class ChessBoardController {
         return chessBoardService.getChessBoardByTeacherId(id);
     }
 
-
-    @GetMapping("/all")
-    public List<ChessboardDTO> getAllChessboards() {
-        return chessBoardService.getAllChessboardsWithMoveCount();
-    }
-
     @GetMapping("/{id}/moves")
     public ResponseEntity<List<ChessMove>> getChessMoves(@PathVariable Long id) {
         List<ChessMove> moves = chessBoardService.getMovesByChessBoardId(id);
@@ -67,9 +59,9 @@ public class ChessBoardController {
     }
 
     // 获取管理员题库
-    @GetMapping("/admin/all")
-    public ResponseEntity<List<ChessBoard>> getAllChessBoardsOfAdmin(){
-        return chessBoardService.getAllChessBoardsOfAdmin();
+    @GetMapping("/basic/all")
+    public ResponseEntity<List<ChessboardDTO>> getAllChessBasicBoards(@RequestParam String role, @RequestParam(required = false) Long studentId) {
+        return chessBoardService.getAllBasicChessBoards(role, studentId);
     }
 
     // 学生完成题目

@@ -4,6 +4,7 @@ import com.example.chess.model.*;
 import com.example.chess.model.DTO.PageResult;
 import com.example.chess.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -100,7 +101,7 @@ public class ClassesService {
     }
 
     //添加残局至班级
-    public ResponseEntity<String> saveClassBoards(List<Long> classesIds,Long chessBoardId){
+    public ResponseEntity<String> saveClassBoards(List<Long> classesIds, Long chessBoardId){
         List<ClassBoard> list = new ArrayList<>();
 
         Optional<ChessBoard> chessBoard = chessBoardRepository.findById(chessBoardId);
@@ -111,6 +112,9 @@ public class ClassesService {
             Optional<Classes> classes = classesRepository.findById(cla);
             if(classes.isEmpty()){
                 throw new RuntimeException("id 为 "+ cla +" 的班级未找到");
+            }
+            if (classBoardRepository.exists(Example.of(new ClassBoard(null,chessBoard.get(),classes.get())))){
+                throw new RuntimeException("已经添加过该残局");
             }
             list.add(new ClassBoard(null,chessBoard.get(),classes.get()));
         }
@@ -163,11 +167,16 @@ public class ClassesService {
     }
 
     //根据班级查找残局
-    public ResponseEntity<List<ChessBoard>> findChessBoardsByClass(Long id){
+    public ResponseEntity<List<ChessboardDTO>> findChessBoardsByClass(Long id, String role, Long studentId){
         if(id == null){
             throw new RuntimeException("传入 id 为 null");
         }
-        List<ChessBoard> list = classBoardRepository.findChessBoardByClassesId(id);
+        List<ChessboardDTO> list;
+        if ("student".equals(role)) {
+            list = classBoardRepository.findChessBoardByClassesIdAndStudentId(id, studentId);
+        } else {
+            list = classBoardRepository.findChessBoardByClassesId(id);
+        }
         if(list == null){
             throw new RuntimeException("未找到对应残局");
         }

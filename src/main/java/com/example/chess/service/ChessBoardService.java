@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -62,14 +60,6 @@ public class ChessBoardService {
         return ResponseEntity.ok(chessBoardRepository.findByPublisherId(teacherId));
     }
 
-    public List<ChessboardDTO> getAllChessboardsWithMoveCount() {
-        List<ChessBoard> chessboards = chessBoardRepository.findAllOfTeacher();
-        return chessboards.stream().map(chessboard -> {
-            int moveCount = chessMoveRepository.countByChessboardId(chessboard.getId());
-            return new ChessboardDTO(chessboard, moveCount);
-        }).collect(Collectors.toList());
-    }
-
     @Transactional(rollbackFor = Exception.class)
     public void deleteChessboard(Long id) {
         deleteChessMovesByChessboardId(id);
@@ -104,8 +94,13 @@ public class ChessBoardService {
     }
 
     //获取管理员题库
-    public ResponseEntity<List<ChessBoard>> getAllChessBoardsOfAdmin(){
-        List<ChessBoard> list = chessBoardRepository.findAllOfAdmin();
+    public ResponseEntity<List<ChessboardDTO>> getAllBasicChessBoards(String role, Long studentId) {
+        List<ChessboardDTO> list;
+        if ("student".equals(role)) {
+            list = chessBoardRepository.findAllBasicByStudentId(studentId);
+        } else {
+            list = chessBoardRepository.findAllBasic();
+        }
         return ResponseEntity.ok(list);
     }
 

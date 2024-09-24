@@ -1,6 +1,7 @@
 package com.example.chess.repository;
 
 import com.example.chess.model.ChessBoard;
+import com.example.chess.model.ChessboardDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,8 +18,16 @@ public interface ChessBoardRepository extends JpaRepository<ChessBoard, Long> {
     List<ChessBoard> findByPublisherId(Long publisherId);
 
     // 获取管理员题库
-    @Query("FROM ChessBoard cb WHERE cb.publisher.role = 'admin' ")
-    List<ChessBoard> findAllOfAdmin();
+    @Query("select new com.example.chess.model.ChessboardDTO(cb) FROM ChessBoard cb WHERE cb.publisher.role = 'admin' ")
+    List<ChessboardDTO> findAllBasic();
+
+    // 学生获取管理员题库, 计算是否已经完成过挑战
+    @Query("select new com.example.chess.model.ChessboardDTO(cb, case when sc.id is null then false else true end) " +
+            "from ChessBoard cb " +
+            "   left join StudentChess sc on cb.id = sc.chessBoard.id " +
+            "                             and sc.student.id = :studentId " +
+            "where cb.publisher.role = 'admin'")
+    List<ChessboardDTO> findAllBasicByStudentId(Long studentId);
 
     // 获取教师题库
     @Query("FROM ChessBoard cb WHERE cb.publisher.role = 'teacher' ")
