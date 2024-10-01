@@ -1,5 +1,10 @@
 package com.example.chess.service;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.context.AnalysisContext;
+import com.alibaba.excel.read.listener.ReadListener;
+import com.alibaba.excel.util.ListUtils;
+import com.example.chess.model.DTO.UserExcel;
 import com.example.chess.model.StudentChess;
 import com.example.chess.model.TeacherStudent;
 import com.example.chess.model.User;
@@ -9,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -86,53 +93,86 @@ public class UserService {
         teacherStudentRepository.delete(teacherStudent);
     }
 
-    //计算一个学生的得分
-    public ResponseEntity<Long> calculateScore(Long studentId){
+    // 计算一个学生的得分
+    public ResponseEntity<Long> calculateScore(Long studentId) {
         Optional<User> student = userRepository.findById(studentId);
-        if(student.isEmpty()){
+        if (student.isEmpty()) {
             throw new RuntimeException("未找到对应学生");
         }
         List<StudentChess> list = studentChessRepository.findByStudentId(studentId);
         Long sum = 0L;
-        for(StudentChess sc : list){
+        for (StudentChess sc : list) {
             sum += sc.getChessBoard().getScore();
         }
         return ResponseEntity.ok(sum);
     }
 
-    //管理员增加用户
-    public ResponseEntity<User> addUser(User user){
-        if(user == null){
+    // 管理员增加用户
+    public ResponseEntity<User> addUser(User user) {
+        if (user == null) {
             throw new RuntimeException("传入 user 为 null");
         }
-        if(getUserByUsername(user.getUsername()) != null){
+        if (getUserByUsername(user.getUsername()) != null) {
             throw new RuntimeException("用户名重复");
         }
-        if(!(Objects.equals(user.getRole(), "student") || Objects.equals(user.getRole(), "teacher") || Objects.equals(user.getRole(), "admin"))){
+        if (!(Objects.equals(user.getRole(), "student") || Objects.equals(user.getRole(), "teacher") || Objects.equals(user.getRole(), "admin"))) {
             throw new RuntimeException("role 字段应为 'student' 或 'teacher' 或 'admin' ");
         }
         user = userRepository.save(user);
         return ResponseEntity.ok(user);
     }
 
-
-    //管理员根据id删除用户
+    // 管理员上传excel批量增加用户
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<String> deleteUserById(Long id){
-        if(id == null){
+    public ResponseEntity<String> addUserBatch(MultipartFile excel, String role) throws IOException {
+        if (!Objects.equals(role, "admin")) {
+            throw new RuntimeException("无权限");
+        }
+        EasyExcel.read(excel.getInputStream(), UserExcel.class, new ReadListener<UserExcel>() {
+            /**
+             * 每隔 BATCH_SIZE 条存储数据库
+             */
+            public static final Integer BATCH_SIZE = 100;
+            private List<User> cache = ListUtils.newArrayListWithExpectedSize(BATCH_SIZE);
+
+            @Override
+            public void invoke(UserExcel user, AnalysisContext analysisContext) {
+                cache.add(new User(user));
+                if (cache.size() >= BATCH_SIZE) {
+                    save();
+                    cache = ListUtils.newArrayListWithExpectedSize(BATCH_SIZE);
+                }
+            }
+
+            @Override
+            public void doAfterAllAnalysed(AnalysisContext analysisContext) {
+                save();
+            }
+
+            private void save() {
+                userRepository.saveAll(cache);
+            }
+        }).sheet().doRead();
+        return ResponseEntity.ok("批量增加用户成功");
+    }
+
+    // 管理员根据id删除用户
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<String> deleteUserById(Long id) {
+        if (id == null) {
             throw new RuntimeException("传入 id 为空值");
         }
         Optional<User> optionalUser = userRepository.findById(id);
-        if(optionalUser.isEmpty()){
+        if (optionalUser.isEmpty()) {
             throw new RuntimeException("未找到对应 user");
         }
         // 如果是学生, 删除学生与班级的关联以及学生的做题记录
-        if(Objects.equals(optionalUser.get().getRole(), "student")){
+        if (Objects.equals(optionalUser.get().getRole(), "student")) {
             classesStudentRepository.deleteByStudentId(id);
             studentChessRepository.deleteByStudentId(id);
         }
         // 如果是教师, 删除教师管理的班级以及教师发布的残局
-        if(Objects.equals(optionalUser.get().getRole(), "teacher")){
+        if (Objects.equals(optionalUser.get().getRole(), "teacher")) {
             teacherClassesRepository.findClassesByTeacherId(id).forEach(classes -> classesService.deleteClass(classes.getId()));
             chessBoardService.deleteChessboardsByTeacherId(id);
         }
@@ -140,10 +180,10 @@ public class UserService {
         return ResponseEntity.ok("删除成功");
     }
 
-    //管理员获取所有用户
-    public ResponseEntity<List<User>> findAllUser(){
+    // 管理员获取所有用户
+    public ResponseEntity<List<User>> findAllUser() {
         List<User> list = userRepository.findAll();
-        for(User user:list){
+        for (User user : list) {
             user.setPassword(null);
         }
         return ResponseEntity.ok(list);
@@ -151,33 +191,33 @@ public class UserService {
 
     // 管理员获取特定类型的用户
     public ResponseEntity<List<User>> getUserByRole(String role) {
-        if(!(Objects.equals(role, "student") || Objects.equals(role, "teacher") || Objects.equals(role, "admin"))){
+        if (!(Objects.equals(role, "student") || Objects.equals(role, "teacher") || Objects.equals(role, "admin"))) {
             throw new RuntimeException("role 字段应为 'student' 或 'teacher' 或 'admin' ");
         }
         List<User> list = userRepository.findByRole(role);
-        for(User user:list){
+        for (User user : list) {
             user.setPassword(null);
         }
         return ResponseEntity.ok(list);
     }
 
-    //管理员根据id修改用户
-    public ResponseEntity<User> updateUser(User newUser){
-        if(newUser == null){
+    // 管理员根据id修改用户
+    public ResponseEntity<User> updateUser(User newUser) {
+        if (newUser == null) {
             throw new RuntimeException("传入 user 为 null");
         }
-        if(!(Objects.equals(newUser.getRole(), "student") || Objects.equals(newUser.getRole(), "teacher") || Objects.equals(newUser.getRole(), "admin"))){
+        if (!(Objects.equals(newUser.getRole(), "student") || Objects.equals(newUser.getRole(), "teacher") || Objects.equals(newUser.getRole(), "admin"))) {
             throw new RuntimeException("role 字段应为 'student' 或 'teacher' 或 'admin' ");
         }
 
-        if(newUser.getId() == null){
+        if (newUser.getId() == null) {
             throw new RuntimeException("传入 user 的 id 为空值");
         }
         Optional<User> optionalUser = userRepository.findById(newUser.getId());
-        if(optionalUser.isEmpty()){
+        if (optionalUser.isEmpty()) {
             throw new RuntimeException("未找到对应 user");
         }
-        if(!Objects.equals(optionalUser.get().getUsername(), newUser.getUsername()) && getUserByUsername(newUser.getUsername()) != null){
+        if (!Objects.equals(optionalUser.get().getUsername(), newUser.getUsername()) && getUserByUsername(newUser.getUsername()) != null) {
             throw new RuntimeException("用户名重复");
         }
         User u = optionalUser.get();

@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -76,6 +78,12 @@ public class UserController {
     @PostMapping("/admin/addUser")
     public ResponseEntity<User> addUser(@RequestBody User user) {
         return userService.addUser(user);
+    }
+
+    // 管理员上传excel批量添加用户
+    @PostMapping("/admin/addUserBatch")
+    public ResponseEntity<String> addUserBatch(@RequestParam MultipartFile excelFile, @RequestParam String role) throws IOException {
+        return userService.addUserBatch(excelFile, role);
     }
 
     //管理员根据id删除用户
